@@ -8,8 +8,6 @@
 struct CooldownState{
   bool isRunning;
   int cooldownCounter;
-  unsigned long timer;
-  int motorDirection;
   
   void tickCooldown(){
     if(cooldownCounter > -1){
@@ -30,16 +28,9 @@ struct CooldownState{
       Serial.println(isRunning);
     }
   }
-
-  void switchMotorDirection(){
-    if(millis() - timer >= 5000){
-      timer = millis();
-      motorDirection *= -1;
-    }
-  }
 };
 
-CooldownState runState = {false, -1, 0L, 1};
+CooldownState runState = {false, -1};
 const int stepsPerRevolution = 2000; // change this to fit the number of steps per revolution
 Stepper myStepper(stepsPerRevolution, 8,10, 9, 11);
 
@@ -62,11 +53,9 @@ void loop()
 
   if(!runState.isRunning) return;
 
-  runState.switchMotorDirection();
-
   //from here run the motor
 
-  myStepper.step(runState.motorDirection * stepsPerRevolution/100); // step one revolution
+  myStepper.step(stepsPerRevolution/100); // step one revolution
   //Serial.println("finished step");
 
   delay(1);
